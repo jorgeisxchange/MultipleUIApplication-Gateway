@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
@@ -38,7 +39,7 @@ public class ResourceApplication extends WebSecurityConfigurerAdapter {
 		return changes;
 	}
 	
-/*	@RequestMapping(value="/", method=RequestMethod.GET)
+	@RequestMapping(value="/", method=RequestMethod.POST)
 	public Map<String, Object> update(@RequestBody Map<String, Object> map, Principal principal) {
 		if(map.containsKey("content")) {
 			message = map.get("content").toString();
@@ -57,7 +58,7 @@ public class ResourceApplication extends WebSecurityConfigurerAdapter {
 		model.put("content", message);
 		
 		return model;
-	}*/
+	}
 	
     public static void main(String[] args) {
         SpringApplication.run(ResourceApplication.class, args);
@@ -66,6 +67,6 @@ public class ResourceApplication extends WebSecurityConfigurerAdapter {
     @Override
 	protected void configure(HttpSecurity http) throws Exception {
     	http.httpBasic().disable();
-        http.authorizeRequests().anyRequest().authenticated();	
+		http.authorizeRequests().antMatchers(HttpMethod.POST, "/**").hasRole("WRITER").anyRequest().authenticated();
     }
 }
