@@ -1,8 +1,10 @@
 package resource;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -23,7 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class ResourceApplication extends WebSecurityConfigurerAdapter {
 	
 	String message = "Hello World";
-	Map<String, Object> changes = new HashMap<String, Object>();
+	//Map<String, Object> changes = new HashMap<String, Object>();
+	List<Map<String,Object>> changes = new ArrayList<Map<String,Object>>();
 	
 	@RequestMapping(value = "/", method=RequestMethod.GET)
 	public Map<String, Object> home() {
@@ -34,8 +37,13 @@ public class ResourceApplication extends WebSecurityConfigurerAdapter {
 		return model;
 	}
 	
-	@RequestMapping(value="/changes", method=RequestMethod.POST)
+/*	@RequestMapping(value="/changes", method=RequestMethod.POST)
 	public Map<String, Object> changes() {
+		return changes;
+	}*/
+	
+	@RequestMapping(value="/changes", method=RequestMethod.POST)
+	public List<Map<String, Object>> changes() {
 		return changes;
 	}
 	
@@ -43,12 +51,18 @@ public class ResourceApplication extends WebSecurityConfigurerAdapter {
 	public Map<String, Object> update(@RequestBody Map<String, Object> map, Principal principal) {
 		if(map.containsKey("content")) {
 			message = map.get("content").toString();
-			changes.put("timestamp", new Date());
-			changes.put("user", principal.getName());
-			changes.put("content", message);
 			
+			Map<String, Object> newMap = new HashMap<String, Object>();
+			
+			newMap.put("timestamp", new Date());
+			newMap.put("user", principal.getName());
+			newMap.put("content", message);
+			
+			changes.add(newMap);
+						
 			if(changes.size() > 10) {
 				//groovy changes = changes[0..9]
+				changes = changes.subList(0, 9);
 			}
 			
 			
@@ -59,6 +73,7 @@ public class ResourceApplication extends WebSecurityConfigurerAdapter {
 		
 		return model;
 	}
+
 	
     public static void main(String[] args) {
         SpringApplication.run(ResourceApplication.class, args);
@@ -68,5 +83,6 @@ public class ResourceApplication extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
     	http.httpBasic().disable();
 		http.authorizeRequests().antMatchers(HttpMethod.POST, "/**").hasRole("WRITER").anyRequest().authenticated();
+    
     }
 }

@@ -43,9 +43,18 @@ function($scope, $http) {
 	
 	$scope.changes = function() {
 		$scope.template = "changes.html";
-		$http.get('/resource/changes').success(function(data) {
+		$http.post('/resource/changes').success(function(data) {
 			$scope.data = data;
+			console.log($scope.data);
 		})
+	}
+	
+	$scope.check = function($data) {
+		if($data) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 });

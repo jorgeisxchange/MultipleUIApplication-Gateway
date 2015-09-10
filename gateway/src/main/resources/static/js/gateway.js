@@ -45,7 +45,7 @@ function($scope, $http) {
 	$scope.logout = function() {
 		$http.post('logout', {}).success(function() {
 			$scope.authenticated = false;
-		}).error(function(data) {
+		}).error(function() {
 			console.log("Logout failed")
 			$scope.authenticated = false;
 		});
